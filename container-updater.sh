@@ -2,28 +2,56 @@
 DISCORD_WEBHOOK=$1
 UPDATED=""
 UPDATE=""
+
+
+
+ERROR_FILE="/var/log/docker-images-update.error"
+
+# make sure that docker is running
+DOCKER_INFO_OUTPUT=$(docker info 2> /dev/null | grep "Containers:" | awk '{print $1}')
+
+if [ "$DOCKER_INFO_OUTPUT" != "Containers:" ]
+  then
+    exit 1
+fi
+
+
 for CONTAINER in $(docker ps --format {{.Names}}); do
-    IMAGE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Image' | cut -d: -f1)
-    token=$(curl --silent "https://auth.docker.io/token?scope=repository:$IMAGE:pull&service=registry.docker.io" | jq -r '.token')
-    digest=$(curl --silent -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
-        -H "Authorization: Bearer $token" \
-        "https://registry.hub.docker.com/v2/$IMAGE/manifests/latest" | jq -r '.config.digest')
-    local_digest=$(docker images -q --no-trunc $IMAGE)
-    if [ "$digest" != "$local_digest" ] ; then
-        UPDATE=$(echo -E "$UPDATE$IMAGE\n")
-        CONTAINERS=$(echo -E "$CONTAINERS$CONTAINER\n")
-        AUTOUPDATE=""
-        AUTOUPDATE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate"')
-        PORTAINER_WEBHOOK=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.webhook"')
-        if [ "$AUTOUPDATE" == "true" ]; then
-            echo ""
-            echo "Update $CONTAINER ..."
-            docker pull $IMAGE
-            curl -X POST $PORTAINER_WEBHOOK
-            UPDATED=$(echo -E "$UPDATED$CONTAINER\n")
+    AUTOUPDATE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate"')
+    if [ "$AUTOUPDATE" == "true" ]; then
+        IMAGE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Image')
+        if ! docker pull $IMAGE | grep "Image is up to date"; then
+            if [ $? != 0 ]; then
+                ERROR=$(cat $ERROR_FILE | grep "not found")
+                if [ "$ERROR" != "" ]; then
+                echo "WARNING: Docker image $IMAGE not found in repository, skipping"
+                else
+                echo "ERROR: docker pull failed on image - $IMAGE"
+                exit 2
+                fi
+            else
+                PORTAINER_WEBHOOK=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.webhook"')
+                curl -X POST $PORTAINER_WEBHOOK
+                UPDATED=$(echo -E "$UPDATED$CONTAINER\n")
+            fi
         fi
     fi
-done
+    if [ "$AUTOUPDATE" == "monitor" ]; then
+        IMAGE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Image')
+        if ! docker pull $IMAGE | grep "Image is up to date"; then
+            if [ $? != 0 ]; then
+                ERROR=$(cat $ERROR_FILE | grep "not found")
+                if [ "$ERROR" != "" ]; then
+                echo "WARNING: Docker image $IMAGE not found in repository, skipping"
+                else
+                echo "ERROR: docker pull failed on image - $IMAGE"
+                exit 2
+                fi
+            else
+                UPDATE=$(echo -E "$UPDATE$CONTAINER\n")
+            fi
+        fi
+    fi
 docker image prune -f
 
 if [[ ! -z "$UPDATED" ]]; then 
@@ -43,7 +71,7 @@ if [[ ! -z "$UPDATED" ]]; then
             },
             {
                "name":"Images",
-               "value":"'$UPDATE'",
+               "value":"'$UPDATE:$TAG'",
                "inline":true
             },
             {
@@ -81,7 +109,7 @@ if [[ ! -z "$UPDATE" ]]; then
                 },
                 {
                    "name":"Images",
-                   "value":"'$UPDATE'",
+                   "value":"'$UPDATE:$TAG'",
                    "inline":true
                 }
              ],
