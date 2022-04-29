@@ -18,8 +18,8 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
         echo "$CONTAINER A METTRE A JOUR ($PORTAINER_WEBHOOK)"
         UPDATED=$(echo -E "$UPDATED$CONTAINER\n")
     fi
-    docker image prune -f
 done
+docker image prune -f
 
 curl  -H "Content-Type: application/json" \
   -d '{
