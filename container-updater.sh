@@ -48,6 +48,7 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
             fi
         fi
     fi
+done
 docker image prune -f
 
 if [[ ! -z "$UPDATED" ]]; then 
