@@ -28,7 +28,7 @@ echo $UPDATE
 echo $CONTAINERS
 echo $UPDATED
 
-if [ -n $UPDATE ]; then 
+if [ -n $UPDATED ]; then 
     curl  -H "Content-Type: application/json" \
     -d '{
         "content": null,
@@ -61,6 +61,37 @@ if [ -n $UPDATE ]; then
         "attachments": []
     }' \
     $DISCORD_WEBHOOK
+    exit
+fi
+if [ -n $UPDATE ]; then 
+    curl  -H "Content-Type: application/json" \
+    -d '{
+        "content": null,
+        "embeds": [
+        {
+            "title": "There are some updates to do !",
+            "color": 16759896,
+            "fields": [
+            {
+                "name": "Container",
+                "value": "'$CONTAINERS'",
+                "inline": true
+            },
+            {
+                "name": "Images",
+                "value": "'$UPDATE'",
+                "inline": true
+            },
+            ],
+            "author": {
+            "name": "'$HOST'"
+            }
+        }
+        ],
+        "attachments": []
+    }' \
+    $DISCORD_WEBHOOK
+    exit
 else
     echo "prout"
     curl  -H "Content-Type: application/json" \
