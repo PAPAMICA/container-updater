@@ -24,6 +24,8 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
 done
 docker image prune -f
 
+echo $UPDATE
+
 if [ -n $UPDATE ]; then 
     curl  -H "Content-Type: application/json" \
     -d '{
