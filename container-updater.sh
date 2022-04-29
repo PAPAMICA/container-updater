@@ -25,6 +25,8 @@ done
 docker image prune -f
 
 echo $UPDATE
+echo $CONTAINERS
+echo $UPDATED
 
 if [ -n $UPDATE ]; then 
     curl  -H "Content-Type: application/json" \
