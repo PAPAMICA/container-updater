@@ -5,12 +5,12 @@ Send notification to Discord :
 
 
 # Supervision
-Pour superviser les mises à jours d'un conteneurs, il faut ajouter ce labe:
+Pour superviser les mises à jours d'un conteneurs, il suffit d'ajouter ce label :
 ```yaml
 labels:
     - "autoupdate=monitor"
 ```
-Dans ce cas, le script essayera de pull l'image, s'il y arrive, il se contentera de d'envoyer une notification à Discord.
+Dans ce cas, le script essayera de pull l'image, s'il y arrive, il se contentera d'envoyer une notification à Discord.
 Il ne vous restera plus qu'à recréer le conteneur.
 
 # Auto-update
@@ -34,7 +34,7 @@ labels:
 
 ## Portainer
 Vous avez besoin d'avoir Portainer en version entreprise (licence gratuite jusqu'à 5 nodes)
-Vous trouverez le webhook dans les paamètres de la stack ou du container.
+Vous trouverez le webhook dans les paramètres de la stack ou du container.
 ```yaml
 labels:
     - "autoupdate=true"
