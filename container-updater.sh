@@ -32,6 +32,7 @@ if [[ ! -z "$UPDATED" ]]; then
     echo "1"
     curl  -H "Content-Type: application/json" \
     -d '{
+        "username": "['$HOST']",
         "content": null,
         "embeds": [
         {
@@ -68,6 +69,7 @@ if [[ ! -z "$UPDATE" ]]; then
     echo "2"
     curl  -H "Content-Type: application/json" \
     -d '{
+        "username": "['$HOST']",
        "content":null,
        "embeds":[
           {
@@ -100,6 +102,7 @@ else
     echo "3"
     curl  -H "Content-Type: application/json" \
     -d '{
+        "username": "['$HOST']",
   "content": null,
   "embeds": [
     {
