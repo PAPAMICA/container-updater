@@ -3,7 +3,6 @@ DISCORD_WEBHOOK=$1
 UPDATED=""
 UPDATE=""
 for CONTAINER in $(docker ps --format {{.Names}}); do
-    echo $CONTAINER
     IMAGE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Image' | cut -d: -f1)
     token=$(curl --silent "https://auth.docker.io/token?scope=repository:$IMAGE:pull&service=registry.docker.io" | jq -r '.token')
     digest=$(curl --silent -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
@@ -24,49 +23,45 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
 done
 docker image prune -f
 
-echo $UPDATE
-echo $CONTAINERS
-echo $UPDATED
-
 if [[ ! -z "$UPDATED" ]]; then 
-    echo "1"
     curl  -H "Content-Type: application/json" \
     -d '{
-        "username": "['$HOSTNAME']",
-        "content": null,
-        "embeds": [
-        {
-            "title": "There are some updates to do !",
-            "color": 16759896,
-            "fields": [
+   "username":"['$HOSTNAME']",
+   "content":null,
+   "embeds":[
+      {
+         "title":"There are some updates to do !",
+         "color":16759896,
+         "fields":[
             {
-                "name": "Container",
-                "value": "'$CONTAINERS'",
-                "inline": true
+               "name":"Container",
+               "value":"'$CONTAINERS'",
+               "inline":true
             },
             {
-                "name": "Images",
-                "value": "'$UPDATE'",
-                "inline": true
+               "name":"Images",
+               "value":"'$UPDATE'",
+               "inline":true
             },
             {
-                "name": "Auto Updated",
-                "value": "'$UPDATED'",
-                "inline": false
+               "name":"Auto Updated",
+               "value":"'$UPDATED'",
+               "inline":false
             }
-            ],
-            "author": {
-            "name": "'$HOSTNAME'"
-            }
-        }
-        ],
-        "attachments": []
-    }' \
+         ],
+         "author":{
+            "name":"'$HOSTNAME'"
+         }
+      }
+   ],
+   "attachments":[
+      
+   ]
+}' \
     $DISCORD_WEBHOOK
     exit
 fi
 if [[ ! -z "$UPDATE" ]]; then 
-    echo "2"
     curl  -H "Content-Type: application/json" \
     -d '{
         "username": "['$HOSTNAME']",
@@ -99,21 +94,22 @@ if [[ ! -z "$UPDATE" ]]; then
     $DISCORD_WEBHOOK
     exit
 else
-    echo "3"
     curl  -H "Content-Type: application/json" \
     -d '{
-        "username": "['$HOSTNAME']",
-  "content": null,
-  "embeds": [
-    {
-      "title": "Everything is up to date ! 😍",
-      "color": 5832543,
-      "author": {
-        "name": "'$HOSTNAME'"
+   "username":"['$HOSTNAME']",
+   "content":null,
+   "embeds":[
+      {
+         "title":"Everything is up to date ! 😍",
+         "color":5832543,
+         "author":{
+            "name":"'$HOSTNAME'"
+         }
       }
-    }
-  ],
-  "attachments": []
+   ],
+   "attachments":[
+      
+   ]
 }' \
     $DISCORD_WEBHOOK
 fi
