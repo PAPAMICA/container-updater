@@ -1,5 +1,8 @@
 # container-updater
-A little bash script for alert and autoupdate container with Portainer.
+A little bash script for alert and autoupdate container deployed with docker-compose, or docker run or Portainer.
+Send notification to Discord :
+![ohunebellenotif](https://send.papamica.fr/f.php?h=25rsdWHk&p=1)
+
 
 # Supervision
 Pour superviser les mises à jours d'un conteneurs, il faut ajouter ce labe:
