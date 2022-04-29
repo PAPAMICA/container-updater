@@ -32,7 +32,7 @@ if [[ ! -z "$UPDATED" ]]; then
     echo "1"
     curl  -H "Content-Type: application/json" \
     -d '{
-        "username": "['$HOST']",
+        "username": "['$HOSTNAME']",
         "content": null,
         "embeds": [
         {
@@ -56,7 +56,7 @@ if [[ ! -z "$UPDATED" ]]; then
             }
             ],
             "author": {
-            "name": "'$HOST'"
+            "name": "'$HOSTNAME'"
             }
         }
         ],
@@ -69,7 +69,7 @@ if [[ ! -z "$UPDATE" ]]; then
     echo "2"
     curl  -H "Content-Type: application/json" \
     -d '{
-        "username": "['$HOST']",
+        "username": "['$HOSTNAME']",
        "content":null,
        "embeds":[
           {
@@ -88,7 +88,7 @@ if [[ ! -z "$UPDATE" ]]; then
                 }
              ],
              "author":{
-                "name":"'$HOST'"
+                "name":"'$HOSTNAME'"
              }
           }
        ],
@@ -102,14 +102,14 @@ else
     echo "3"
     curl  -H "Content-Type: application/json" \
     -d '{
-        "username": "['$HOST']",
+        "username": "['$HOSTNAME']",
   "content": null,
   "embeds": [
     {
       "title": "Everything is up to date ! 😍",
       "color": 5832543,
       "author": {
-        "name": "'$HOST'"
+        "name": "'$HOSTNAME'"
       }
     }
   ],
