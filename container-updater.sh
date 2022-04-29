@@ -24,35 +24,52 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
 done
 docker image prune -f
 
-curl  -H "Content-Type: application/json" \
-  -d '{
-    "content": null,
-    "embeds": [
-      {
-        "title": "There are some updates to do !",
-        "color": 16759896,
-        "fields": [
-          {
-            "name": "Container",
-            "value": "'$CONTAINERS'",
-            "inline": true
-          },
-          {
-            "name": "Images",
-            "value": "'$UPDATE'",
-            "inline": true
-          },
-          {
-            "name": "Auto Updated",
-            "value": "'$UPDATED'",
-            "inline": false
-          }
-        ],
-        "author": {
-          "name": "'$HOST'"
+if [ -n $UPDATE ]; then 
+    curl  -H "Content-Type: application/json" \
+    -d '{
+        "content": null,
+        "embeds": [
+        {
+            "title": "There are some updates to do !",
+            "color": 16759896,
+            "fields": [
+            {
+                "name": "Container",
+                "value": "'$CONTAINERS'",
+                "inline": true
+            },
+            {
+                "name": "Images",
+                "value": "'$UPDATE'",
+                "inline": true
+            },
+            {
+                "name": "Auto Updated",
+                "value": "'$UPDATED'",
+                "inline": false
+            }
+            ],
+            "author": {
+            "name": "'$HOST'"
+            }
         }
+        ],
+        "attachments": []
+    }' \
+    $DISCORD_WEBHOOK
+else
+    curl  -H "Content-Type: application/json" \
+    -d '{
+  "content": null,
+  "embeds": [
+    {
+      "title": "Everything is up to date ! 😍",
+      "color": 5832543,
+      "author": {
+        "name": "'$HOST'"
       }
-    ],
-    "attachments": []
-  }' \
-  $DISCORD_WEBHOOK
+    }
+  ],
+  "attachments": []
+}' \
+    $DISCORD_WEBHOOK
