@@ -29,6 +29,7 @@ echo $CONTAINERS
 echo $UPDATED
 
 if [ -n $UPDATED ]; then 
+    echo "1"
     curl  -H "Content-Type: application/json" \
     -d '{
         "content": null,
@@ -64,6 +65,7 @@ if [ -n $UPDATED ]; then
     exit
 fi
 if [ -n $UPDATE ]; then 
+    echo "2"
     curl  -H "Content-Type: application/json" \
     -d '{
         "content": null,
@@ -93,7 +95,7 @@ if [ -n $UPDATE ]; then
     $DISCORD_WEBHOOK
     exit
 else
-    echo "prout"
+    echo "3"
     curl  -H "Content-Type: application/json" \
     -d '{
   "content": null,
