@@ -44,6 +44,7 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
                 exit 2
                 fi
             else
+                echo "Status: $IMAGE has been updated !"
                 UPDATE=$(echo -E "$UPDATE$IMAGEgic fix
                 \n")
                 CONTAINERS=$(echo -E "$UPDATE$CONTAINER\n")
