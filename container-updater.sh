@@ -3,10 +3,6 @@ DISCORD_WEBHOOK=$1
 UPDATED=""
 UPDATE=""
 
-
-
-ERROR_FILE="/var/log/docker-images-update.error"
-
 # make sure that docker is running
 DOCKER_INFO_OUTPUT=$(docker info 2> /dev/null | grep "Containers:" | awk '{print $1}')
 
@@ -71,7 +67,7 @@ if [[ ! -z "$UPDATED" ]]; then
             },
             {
                "name":"Images",
-               "value":"'$UPDATE:$TAG'",
+               "value":"'$UPDATE'",
                "inline":true
             },
             {
@@ -109,7 +105,7 @@ if [[ ! -z "$UPDATE" ]]; then
                 },
                 {
                    "name":"Images",
-                   "value":"'$UPDATE:$TAG'",
+                   "value":"'$UPDATE'",
                    "inline":true
                 }
              ],
