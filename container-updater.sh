@@ -44,7 +44,10 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
                 exit 2
                 fi
             else
-                UPDATE=$(echo -E "$UPDATE$CONTAINER\n")
+                UPDATE=$(echo -E "$UPDATE$IMAGEgic fix
+                \n")
+                CONTAINERS=$(echo -E "$UPDATE$CONTAINER\n")
+                
             fi
         fi
     fi
