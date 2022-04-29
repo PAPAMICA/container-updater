@@ -12,15 +12,15 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
     if [ "$digest" != "$local_digest" ] ; then
         UPDATE=$(echo -E "$UPDATE$IMAGE\n")
         CONTAINERS=$(echo -E "$CONTAINERS$CONTAINER\n")
-    fi
-    AUTOUPDATE=""
-    AUTOUPDATE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate"')
-    PORTAINER_WEBHOOK=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.webhook"')
-    if [ "$AUTOUPDATE" == "true" ]; then
-        echo "\n Update $CONTAINER ..."
-        docker pull $IMAGE
-        curl -X POST $PORTAINER_WEBHOOK
-        UPDATED=$(echo -E "$UPDATED$CONTAINER\n")
+        AUTOUPDATE=""
+        AUTOUPDATE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate"')
+        PORTAINER_WEBHOOK=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.webhook"')
+        if [ "$AUTOUPDATE" == "true" ]; then
+            echo "\n Update $CONTAINER ..."
+            docker pull $IMAGE
+            curl -X POST $PORTAINER_WEBHOOK
+            UPDATED=$(echo -E "$UPDATED$CONTAINER\n")
+        fi
     fi
 done
 docker image prune -f
