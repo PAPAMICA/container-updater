@@ -68,29 +68,31 @@ if [[ ! -z "$UPDATE" ]]; then
     echo "2"
     curl  -H "Content-Type: application/json" \
     -d '{
-        "content": null,
-        "embeds": [
-        {
-            "title": "There are some updates to do !",
-            "color": 16759896,
-            "fields": [
-            {
-                "name": "Container",
-                "value": "'$CONTAINERS'",
-                "inline": true
-            },
-            {
-                "name": "Images",
-                "value": "'$UPDATE'",
-                "inline": true
-            },
-            ],
-            "author": {
-            "name": "'$HOST'"
-            }
-        }
-        ],
-        "attachments": []
+       "content":null,
+       "embeds":[
+          {
+             "title":"There are some updates to do !",
+             "color":16759896,
+             "fields":[
+                {
+                   "name":"Container",
+                   "value":"'$CONTAINERS'",
+                   "inline":true
+                },
+                {
+                   "name":"Images",
+                   "value":"'$UPDATE'",
+                   "inline":true
+                }
+             ],
+             "author":{
+                "name":"'$HOST'"
+             }
+          }
+       ],
+       "attachments":[
+          
+       ]
     }' \
     $DISCORD_WEBHOOK
     exit
