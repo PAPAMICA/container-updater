@@ -58,6 +58,7 @@ if [ -n $UPDATE ]; then
     }' \
     $DISCORD_WEBHOOK
 else
+    echo "prout"
     curl  -H "Content-Type: application/json" \
     -d '{
   "content": null,
