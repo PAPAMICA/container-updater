@@ -1,5 +1,7 @@
 #!/bin/bash
 DISCORD_WEBHOOK=$1
+UPDATED=""
+UPDATE=""
 for CONTAINER in $(docker ps --format {{.Names}}); do
     echo $CONTAINER
     IMAGE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Image' | cut -d: -f1)
