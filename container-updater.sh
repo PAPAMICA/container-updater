@@ -16,7 +16,8 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
         AUTOUPDATE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate"')
         PORTAINER_WEBHOOK=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.webhook"')
         if [ "$AUTOUPDATE" == "true" ]; then
-            echo "\n Update $CONTAINER ..."
+            echo ""
+            echo "Update $CONTAINER ..."
             docker pull $IMAGE
             curl -X POST $PORTAINER_WEBHOOK
             UPDATED=$(echo -E "$UPDATED$CONTAINER\n")
