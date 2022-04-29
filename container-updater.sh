@@ -73,3 +73,4 @@ else
   "attachments": []
 }' \
     $DISCORD_WEBHOOK
+fi
