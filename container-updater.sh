@@ -1,6 +1,7 @@
 #!/bin/bash
 DISCORD_WEBHOOK=$1
 for CONTAINER in $(docker ps --format {{.Names}}); do
+    echo $CONTAINER
     IMAGE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Image' | cut -d: -f1)
     token=$(curl --silent "https://auth.docker.io/token?scope=repository:$IMAGE:pull&service=registry.docker.io" | jq -r '.token')
     digest=$(curl --silent -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
