@@ -28,7 +28,7 @@ echo $UPDATE
 echo $CONTAINERS
 echo $UPDATED
 
-if [ -n $UPDATED ]; then 
+if [[ ! -z "$UPDATED" ]]; then 
     echo "1"
     curl  -H "Content-Type: application/json" \
     -d '{
@@ -64,7 +64,7 @@ if [ -n $UPDATED ]; then
     $DISCORD_WEBHOOK
     exit
 fi
-if [ -n $UPDATE ]; then 
+if [[ ! -z "$UPDATE" ]]; then 
     echo "2"
     curl  -H "Content-Type: application/json" \
     -d '{
