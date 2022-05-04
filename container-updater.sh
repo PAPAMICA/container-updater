@@ -94,9 +94,11 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
         Check-Remote-Digest
         RESULT=$(Compare-Digest)
          if [ "$RESULT" == "UPDATE" ]; then
-            echo " 🚀 [$IMAGE_LOCAL] Update available !"
+            echo " 🚸 [$IMAGE_LOCAL] Update available !"
+            echo " 🚀 [$IMAGE_LOCAL] Launch autoupdate !"
             PORTAINER_WEBHOOK=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.webhook"')
             curl -X POST $PORTAINER_WEBHOOK
+
             UPDATED=$(echo -E "$UPDATED$CONTAINER\n")
          else
             echo " ✅ [$IMAGE_LOCAL] Already up to date."
@@ -109,7 +111,7 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
         Check-Remote-Digest
         RESULT=$(Compare-Digest)
          if [ "$RESULT" == "UPDATE" ]; then
-            echo " 🚀 [$IMAGE_LOCAL] Update available !"
+            echo " 🚸 [$IMAGE_LOCAL] Update available !"
             UPDATE=$(echo -E "$UPDATE$IMAGE\n")
             CONTAINERS=$(echo -E "$CONTAINERS$CONTAINER\n")
          else
