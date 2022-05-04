@@ -93,7 +93,7 @@ Check-Remote-Digest () {
       "https://${IMAGE_REGISTRY_API}/v2/${IMAGE_PATH}/manifests/${IMAGE_TAG}")
    RESPONSE_ERRORS=$(jq -r "try .errors[] // empty" <<< $DIGEST_RESPONSE)
    if [[ -n $RESPONSE_ERRORS ]]; then
-      echo "Error during API request occurred: $(echo "$RESPONSE_ERRORS" | jq -r .message)" 1>&2
+      echo " ❌ [$IMAGE_LOCAL] Error during API request occurred: $(echo "$RESPONSE_ERRORS" | jq -r .message)" 1>&2
       exit 1
    fi
    DIGEST_REMOTE=$(jq -r ".config.digest" <<< $DIGEST_RESPONSE)
