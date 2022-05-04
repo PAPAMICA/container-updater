@@ -96,8 +96,18 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
          if [ "$RESULT" == "UPDATE" ]; then
             echo " 🚸 [$IMAGE_LOCAL] Update available !"
             echo " 🚀 [$IMAGE_LOCAL] Launch autoupdate !"
+            DOCKER_COMPOSE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.docker-compose"')
+            if [[ ! -z "$DOCKER_COMPOSE" ]]; then 
+               docker-compose -f $DOCKER_COMPOSE up -d
+            fi
             PORTAINER_WEBHOOK=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.webhook"')
-            curl -X POST $PORTAINER_WEBHOOK
+            if [[ ! -z "$PORTAINER_WEBHOOK" ]]; then 
+               curl -X POST $PORTAINER_WEBHOOK
+            fi
+            DOCKER_RUN=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.docker-run"')
+            if [[ ! -z "$DOCKER_RUN" ]]; then 
+               docker run $DOCKER_RUN
+            fi
             UPDATED=$(echo -E "$UPDATED$CONTAINER\n")
          else
             echo " ✅ [$IMAGE_LOCAL] Already up to date."
@@ -168,7 +178,7 @@ if [[ ! -z "$UPDATED" ]]; then
       {
          "title":"Containers are autoupdated !",
          "color":5832543,
-         "fields":[
+         "fields":[gi
             {
                "name":"Auto Updated",
                "value":"'$UPDATED'",
