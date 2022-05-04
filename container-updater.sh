@@ -7,7 +7,7 @@ UPDATE=""
 
 # Send data to zabbix
 Send-Zabbix-Data () {
-    zabbix_sender -z "$ZABBIX_SRV" -s "$ZABBIX_HOST" -k "$1" -o "$2"
+    zabbix_sender -z "$ZABBIX_SRV" -s "$ZABBIX_HOST" -k "$1" -o "$2" > /dev/null 2> /dev/null
     status=$?
     if test $status -eq 0; then
         echo " ✅   Data sended to Zabbix."
