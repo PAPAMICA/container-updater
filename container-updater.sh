@@ -3,6 +3,19 @@ DISCORD_WEBHOOK=$1
 UPDATED=""
 UPDATE=""
 
+# Check if Debian / Ubuntu and if root
+if [ "$EUID" -ne 0 ]
+  then echo " ❌ Please run as root"
+  exit 1
+fi
+if [ -x "$(command -v apt-get)" ]; then
+    :
+else
+    echo 'This script is only compatible with Debian and Ubuntu'
+    exit 1
+fi
+
+
 # Update debian
 apt update > /dev/null 2> /dev/null
 
@@ -10,6 +23,7 @@ PAQUET_UPDATE=""
 apt list --upgradable 2> /dev/null | tail -n +2 >> temp
 while read line ; do 
     PAQUET=$(echo $line | cut -d / -f 1)
+    echo "  🚸 Update available: $PAQUET"
     PAQUET_UPDATE=$(echo -E "$PAQUET_UPDATE$PAQUET\n")
 done < temp
 rm temp
