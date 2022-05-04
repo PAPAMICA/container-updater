@@ -116,25 +116,27 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
         Check-Image-Uptdate $IMAGE
         Check-Local-Digest
         Check-Remote-Digest
-        RESULT=$(Compare-Digest)
-         if [ "$RESULT" == "UPDATE" ]; then
-            echo " 🚸 [$IMAGE_LOCAL] Update available !"
-            echo " 🚀 [$IMAGE_LOCAL] Launch autoupdate !"
-            DOCKER_COMPOSE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.docker-compose"')
-            if [[ "$DOCKER_COMPOSE" != "null" ]]; then 
-               docker-compose -f $DOCKER_COMPOSE up -d
+        if [[ -z $RESPONSE_ERRORS ]]; then
+         RESULT=$(Compare-Digest)
+            if [ "$RESULT" == "UPDATE" ]; then
+               echo " 🚸 [$IMAGE_LOCAL] Update available !"
+               echo " 🚀 [$IMAGE_LOCAL] Launch autoupdate !"
+               DOCKER_COMPOSE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.docker-compose"')
+               if [[ "$DOCKER_COMPOSE" != "null" ]]; then 
+                  docker-compose -f $DOCKER_COMPOSE up -d
+               fi
+               PORTAINER_WEBHOOK=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.webhook"')
+               if [[ "$PORTAINER_WEBHOOK" != "null" ]]; then 
+                  curl -X POST $PORTAINER_WEBHOOK
+               fi
+               DOCKER_RUN=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.docker-run"')
+               if [[ "$DOCKER_RUN" != "null" ]]; then 
+                  docker run $DOCKER_RUN
+               fi
+               UPDATED=$(echo -E "$UPDATED$CONTAINER\n")
+            else
+               echo " ✅ [$IMAGE_LOCAL] Already up to date."
             fi
-            PORTAINER_WEBHOOK=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.webhook"')
-            if [[ "$PORTAINER_WEBHOOK" != "null" ]]; then 
-               curl -X POST $PORTAINER_WEBHOOK
-            fi
-            DOCKER_RUN=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.docker-run"')
-            if [[ "$DOCKER_RUN" != "null" ]]; then 
-               docker run $DOCKER_RUN
-            fi
-            UPDATED=$(echo -E "$UPDATED$CONTAINER\n")
-         else
-            echo " ✅ [$IMAGE_LOCAL] Already up to date."
          fi
     fi
     if [ "$AUTOUPDATE" == "monitor" ]; then
