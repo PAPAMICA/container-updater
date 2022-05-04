@@ -27,6 +27,9 @@ while read line ; do
     PAQUET_UPDATE=$(echo -E "$PAQUET_UPDATE$PAQUET\n")
 done < temp
 rm temp
+if [[ -z "$PAQUET_UPDATE" ]]; then
+   echo " ✅ System is already up to date."
+fi
 
 # make sure that docker is running
 DOCKER_INFO_OUTPUT=$(docker info 2> /dev/null | grep "Containers:" | awk '{print $1}')
