@@ -29,6 +29,7 @@ labels:
     - "autoupdate=true"
     - "autoupdate.docker-run=<docker_run_command>"
 ```
+Note : ne pas inclure `docker run` dans la commande (juste la suite).
 
 ## Portainer
 Vous avez besoin d'avoir Portainer en version entreprise (licence gratuite jusqu'à 5 nodes)
