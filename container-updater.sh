@@ -76,11 +76,9 @@ Check-Remote-Digest () {
 
 Compare-Digest () {
    if [ "$DIGEST_LOCAL" != "$DIGEST_REMOTE" ] ; then
-      echo " 🚀 [$IMAGE_LOCAL] Update available !"
-      UPDATE=$(echo -E "$UPDATE$IMAGE\n")
-      CONTAINERS=$(echo -E "$CONTAINERS$CONTAINER\n")
+      echo "UPDATE"
    else
-      echo " ✅ [$IMAGE_LOCAL] Already up to date."
+      echo "OK"
    fi
 }
 
@@ -94,14 +92,29 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
         Check-Image-Uptdate $IMAGE
         Check-Local-Digest
         Check-Remote-Digest
-        Compare-Digest
+        RESULT=$(Compare-Digest)
+         if [ "$RESULT" == "UPDATE" ]; then
+            echo " 🚀 [$IMAGE_LOCAL] Update available !"
+            PORTAINER_WEBHOOK=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.webhook"')
+            curl -X POST $PORTAINER_WEBHOOK
+            UPDATED=$(echo -E "$UPDATED$CONTAINER\n")
+         else
+            echo " ✅ [$IMAGE_LOCAL] Already up to date."
+         fi
     fi
     if [ "$AUTOUPDATE" == "monitor" ]; then
         IMAGE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Image')
         Check-Image-Uptdate $IMAGE
         Check-Local-Digest
         Check-Remote-Digest
-        Compare-Digest
+        RESULT=$(Compare-Digest)
+         if [ "$RESULT" == "UPDATE" ]; then
+            echo " 🚀 [$IMAGE_LOCAL] Update available !"
+            UPDATE=$(echo -E "$UPDATE$IMAGE\n")
+            CONTAINERS=$(echo -E "$CONTAINERS$CONTAINER\n")
+         else
+            echo " ✅ [$IMAGE_LOCAL] Already up to date."
+         fi
     fi
 done
 # docker image prune -f
