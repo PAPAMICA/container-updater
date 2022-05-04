@@ -3,6 +3,17 @@ DISCORD_WEBHOOK=$1
 UPDATED=""
 UPDATE=""
 
+# Update debian
+apt update > /dev/null 2> /dev/null
+
+PAQUET_UPDATE=""
+apt list --upgradable 2> /dev/null | tail -n +2 >> temp
+while read line ; do 
+    PAQUET=$(echo $line | cut -d / -f 1)
+    PAQUET_UPDATE=$(echo -E "$PAQUET_UPDATE$PAQUET\n")
+done < temp
+rm temp
+
 # make sure that docker is running
 DOCKER_INFO_OUTPUT=$(docker info 2> /dev/null | grep "Containers:" | awk '{print $1}')
 
@@ -128,7 +139,7 @@ done
 echo ""
 docker image prune -f
 
-if [[ ! -z "$UPDATED" ]] && [[ ! -z "$UPDATE" ]]; then 
+if [[ ! -z "$UPDATED" ]] && [[ ! -z "$UPDATE" ]] && [[ ! -z "$PAQUET_UPDATE" ]]; then 
     curl  -H "Content-Type: application/json" \
     -d '{
    "username":"['$HOSTNAME']",
@@ -139,7 +150,12 @@ if [[ ! -z "$UPDATED" ]] && [[ ! -z "$UPDATE" ]]; then
          "color":16759896,
          "fields":[
             {
-               "name":"Container",
+               "name":"Paquets",
+               "value":"'$PAQUET_UPDATE'",
+               "inline":true
+            },
+            {
+               "name":"Containers",
                "value":"'$CONTAINERS'",
                "inline":true
             },
@@ -166,6 +182,80 @@ if [[ ! -z "$UPDATED" ]] && [[ ! -z "$UPDATE" ]]; then
     $DISCORD_WEBHOOK
     exit
 fi
+
+if [[ ! -z "$UPDATED" ]] && [[ ! -z "$UPDATE" ]]; then 
+    curl  -H "Content-Type: application/json" \
+    -d '{
+   "username":"['$HOSTNAME']",
+   "content":null,
+   "embeds":[
+      {
+         "title":"There are some updates to do !",
+         "color":16759896,
+         "fields":[
+            {
+               "name":"Containers",
+               "value":"'$CONTAINERS'",
+               "inline":true
+            },
+            {
+               "name":"Images",
+               "value":"'$UPDATE'",
+               "inline":true
+            },
+            {
+               "name":"Auto Updated",
+               "value":"'$UPDATED'",
+               "inline":false
+            }
+         ],
+         "author":{
+            "name":"'$HOSTNAME'"
+         }
+      }
+   ],
+   "attachments":[
+      
+   ]
+}' \
+    $DISCORD_WEBHOOK
+    exit
+fi
+
+if [[ ! -z "$UPDATED" ]] && [[ ! -z "$PAQUET_UPDATE" ]]; then 
+    curl  -H "Content-Type: application/json" \
+    -d '{
+   "username":"['$HOSTNAME']",
+   "content":null,
+   "embeds":[
+      {
+         "title":"Containers are autoupdated !",
+         "color":5832543,
+         "fields":[
+            {
+               "name":"Paquets",
+               "value":"'$PAQUET_UPDATE'",
+               "inline":true
+            },
+            {
+               "name":"Auto Updated",
+               "value":"'$UPDATED'",
+               "inline":false
+            }
+         ],
+         "author":{
+            "name":"'$HOSTNAME'"
+         }
+      }
+   ],
+   "attachments":[
+      
+   ]
+}' \
+    $DISCORD_WEBHOOK
+    exit
+fi
+
 if [[ ! -z "$UPDATED" ]]; then 
     curl  -H "Content-Type: application/json" \
     -d '{
@@ -194,6 +284,47 @@ if [[ ! -z "$UPDATED" ]]; then
     $DISCORD_WEBHOOK
     exit
 fi
+
+
+if [[ ! -z "$UPDATE" ]] && [[ ! -z "$PAQUET_UPDATE" ]]; then 
+    curl  -H "Content-Type: application/json" \
+    -d '{
+        "username": "['$HOSTNAME']",
+       "content":null,
+       "embeds":[
+          {
+             "title":"There are some updates to do !",
+             "color":16759896,
+               "fields":[
+               {
+                  "name":"Paquets",
+                  "value":"'$PAQUET_UPDATE'",
+                  "inline":true
+               },
+                {
+                   "name":"Containers",
+                   "value":"'$CONTAINERS'",
+                   "inline":true
+                },
+                {
+                   "name":"Images",
+                   "value":"'$UPDATE'",
+                   "inline":true
+                }
+             ],
+             "author":{
+                "name":"'$HOSTNAME'"
+             }
+          }
+       ],
+       "attachments":[
+          
+       ]
+    }' \
+    $DISCORD_WEBHOOK
+    exit
+fi
+
 if [[ ! -z "$UPDATE" ]]; then 
     curl  -H "Content-Type: application/json" \
     -d '{
@@ -205,7 +336,7 @@ if [[ ! -z "$UPDATE" ]]; then
              "color":16759896,
              "fields":[
                 {
-                   "name":"Container",
+                   "name":"Containers",
                    "value":"'$CONTAINERS'",
                    "inline":true
                 },
@@ -214,6 +345,35 @@ if [[ ! -z "$UPDATE" ]]; then
                    "value":"'$UPDATE'",
                    "inline":true
                 }
+             ],
+             "author":{
+                "name":"'$HOSTNAME'"
+             }
+          }
+       ],
+       "attachments":[
+          
+       ]
+    }' \
+    $DISCORD_WEBHOOK
+    exit
+fi
+
+if [[ ! -z "$PAQUET_UPDATE" ]]; then 
+    curl  -H "Content-Type: application/json" \
+    -d '{
+        "username": "['$HOSTNAME']",
+       "content":null,
+       "embeds":[
+          {
+             "title":"There are some updates to do !",
+             "color":16759896,
+               "fields":[
+               {
+                  "name":"Paquets",
+                  "value":"'$PAQUET_UPDATE'",
+                  "inline":true
+               }
              ],
              "author":{
                 "name":"'$HOSTNAME'"
