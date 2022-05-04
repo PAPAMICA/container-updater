@@ -98,7 +98,6 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
             echo " 🚀 [$IMAGE_LOCAL] Launch autoupdate !"
             PORTAINER_WEBHOOK=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.webhook"')
             curl -X POST $PORTAINER_WEBHOOK
-
             UPDATED=$(echo -E "$UPDATED$CONTAINER\n")
          else
             echo " ✅ [$IMAGE_LOCAL] Already up to date."
@@ -122,7 +121,7 @@ done
 echo ""
 docker image prune -f
 
-if [[ ! -z "$UPDATED" ]]; then 
+if [[ ! -z "$UPDATED" ]] && [[ ! -z "$UPDATE" ]]; then 
     curl  -H "Content-Type: application/json" \
     -d '{
    "username":"['$HOSTNAME']",
@@ -142,6 +141,34 @@ if [[ ! -z "$UPDATED" ]]; then
                "value":"'$UPDATE'",
                "inline":true
             },
+            {
+               "name":"Auto Updated",
+               "value":"'$UPDATED'",
+               "inline":false
+            }
+         ],
+         "author":{
+            "name":"'$HOSTNAME'"
+         }
+      }
+   ],
+   "attachments":[
+      
+   ]
+}' \
+    $DISCORD_WEBHOOK
+    exit
+fi
+if [[ ! -z "$UPDATED" ]]; then 
+    curl  -H "Content-Type: application/json" \
+    -d '{
+   "username":"['$HOSTNAME']",
+   "content":null,
+   "embeds":[
+      {
+         "title":"Containers are autoupdated !",
+         "color":5832543,
+         "fields":[
             {
                "name":"Auto Updated",
                "value":"'$UPDATED'",
