@@ -97,15 +97,15 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
             echo " 🚸 [$IMAGE_LOCAL] Update available !"
             echo " 🚀 [$IMAGE_LOCAL] Launch autoupdate !"
             DOCKER_COMPOSE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.docker-compose"')
-            if [[ ! -z "$DOCKER_COMPOSE" ]]; then 
+            if [[ "$DOCKER_COMPOSE" != "null" ]]; then 
                docker-compose -f $DOCKER_COMPOSE up -d
             fi
             PORTAINER_WEBHOOK=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.webhook"')
-            if [[ ! -z "$PORTAINER_WEBHOOK" ]]; then 
+            if [[ "$PORTAINER_WEBHOOK" != "null" ]]; then 
                curl -X POST $PORTAINER_WEBHOOK
             fi
             DOCKER_RUN=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.docker-run"')
-            if [[ ! -z "$DOCKER_RUN" ]]; then 
+            if [[ "$DOCKER_RUN" != "null" ]]; then 
                docker run $DOCKER_RUN
             fi
             UPDATED=$(echo -E "$UPDATED$CONTAINER\n")
