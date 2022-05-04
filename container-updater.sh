@@ -123,7 +123,7 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
                echo " 🚀 [$IMAGE_LOCAL] Launch autoupdate !"
                DOCKER_COMPOSE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.docker-compose"')
                if [[ "$DOCKER_COMPOSE" != "null" ]]; then 
-                  docker-compose -f $DOCKER_COMPOSE up -d
+                  docker-compose pull -f $DOCKER_COMPOSE && docker-compose -f $DOCKER_COMPOSE up -d
                fi
                PORTAINER_WEBHOOK=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.webhook"')
                if [[ "$PORTAINER_WEBHOOK" != "null" ]]; then 
@@ -131,7 +131,7 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
                fi
                DOCKER_RUN=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.docker-run"')
                if [[ "$DOCKER_RUN" != "null" ]]; then 
-                  docker run $DOCKER_RUN
+                  docker stop $CONTAINER && docker rm $CONTAINER && docker pull $IMAGE_LOCAL && docker run $DOCKER_RUN
                fi
                UPDATED=$(echo -E "$UPDATED$CONTAINER\n")
             else
