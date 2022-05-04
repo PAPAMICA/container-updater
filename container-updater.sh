@@ -144,13 +144,15 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
         Check-Image-Uptdate $IMAGE
         Check-Local-Digest
         Check-Remote-Digest
-        RESULT=$(Compare-Digest)
-         if [ "$RESULT" == "UPDATE" ]; then
-            echo " 🚸 [$IMAGE_LOCAL] Update available !"
-            UPDATE=$(echo -E "$UPDATE$IMAGE\n")
-            CONTAINERS=$(echo -E "$CONTAINERS$CONTAINER\n")
-         else
-            echo " ✅ [$IMAGE_LOCAL] Already up to date."
+        if [[ -z $RESPONSE_ERRORS ]]; then
+         RESULT=$(Compare-Digest)
+            if [ "$RESULT" == "UPDATE" ]; then
+               echo " 🚸 [$IMAGE_LOCAL] Update available !"
+               UPDATE=$(echo -E "$UPDATE$IMAGE\n")
+               CONTAINERS=$(echo -E "$CONTAINERS$CONTAINER\n")
+            else
+               echo " ✅ [$IMAGE_LOCAL] Already up to date."
+            fi
          fi
     fi
 done
