@@ -10,8 +10,8 @@ Pour superviser les mises à jours d'un conteneurs, il suffit d'ajouter ce label
 labels:
     - "autoupdate=monitor"
 ```
-Dans ce cas, le script essayera de pull l'image, s'il y arrive, il se contentera d'envoyer une notification à Discord.
-Il ne vous restera plus qu'à recréer le conteneur.
+Dans ce cas, si une mise à jour est disponible, le script se contentera d'envoyer une notification à Discord.
+Il ne vous restera plus qu'à mettre à jour le conteneur.
 
 # Auto-update
 Pour activer la mise à jour automatique du conteneur, il faut ajouter ces labels :
