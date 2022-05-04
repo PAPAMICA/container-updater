@@ -82,9 +82,6 @@ Compare-Digest () {
    fi
 }
 
-
-
-
 for CONTAINER in $(docker ps --format {{.Names}}); do
     AUTOUPDATE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate"')
     if [ "$AUTOUPDATE" == "true" ]; then

@@ -20,7 +20,6 @@ Pour activer la mise à jour automatique du conteneur, il faut ajouter ces label
 ```yaml
 labels:
     - "autoupdate=true"
-    - "autoupdate.type=docker-compose"
     - "autoupdate.docker-compose=/lien/vers/le/fichier/docker-compose.yml"
 ```
 
@@ -28,7 +27,6 @@ labels:
 ```yaml
 labels:
     - "autoupdate=true"
-    - "autoupdate.type=docker-run"
     - "autoupdate.docker-run=<docker_run_command>"
 ```
 
@@ -38,7 +36,6 @@ Vous trouverez le webhook dans les paramètres de la stack ou du container.
 ```yaml
 labels:
     - "autoupdate=true"
-    - "autoupdate.type=portainer"
     - "autoupdate.webhook=<webhook_url>"
 ```
 
