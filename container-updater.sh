@@ -1,7 +1,20 @@
 #!/bin/bash
 DISCORD_WEBHOOK=$1
+ZABBIX_SRV=$2
+ZABBIX_HOST=$HOSTNAME
 UPDATED=""
 UPDATE=""
+
+# Send data to zabbix
+Send-Zabbix-Data () {
+    zabbix_sender -z "$ZABBIX_SRV" -s "$ZABBIX_HOST" -k "$1" -o "$2"
+    status=$?
+    if test $status -eq 0; then
+        echo " ✅   Data sended to Zabbix."
+    else
+        echo " ❌   ERROR : A problem was encountered during the send data to Zabbix."
+    fi
+}
 
 # Check if Debian / Ubuntu and if root
 if [ "$EUID" -ne 0 ]
@@ -20,16 +33,24 @@ fi
 apt update > /dev/null 2> /dev/null
 
 PAQUET_UPDATE=""
+PAQUET_NB=0
 apt list --upgradable 2> /dev/null | tail -n +2 >> temp
 while read line ; do 
     PAQUET=$(echo $line | cut -d / -f 1)
     echo "  🚸 Update available: $PAQUET"
     PAQUET_UPDATE=$(echo -E "$PAQUET_UPDATE$PAQUET\n")
+    ((PAQUET_NB++))
 done < temp
 rm temp
+
+if [[ -n $ZABBIX_SRV ]]; then
+   Send-Zabbix-Data "update.paquets" $PAQUET_NB
+fi
+
 if [[ -z "$PAQUET_UPDATE" ]]; then
    echo " ✅ System is already up to date."
 fi
+
 
 # make sure that docker is running
 DOCKER_INFO_OUTPUT=$(docker info 2> /dev/null | grep "Containers:" | awk '{print $1}')
@@ -108,7 +129,8 @@ Compare-Digest () {
       echo "OK"
    fi
 }
-
+CONTAINERS_NB=0
+CONTAINERS_NB_U=0
 for CONTAINER in $(docker ps --format {{.Names}}); do
     AUTOUPDATE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate"')
     if [ "$AUTOUPDATE" == "true" ]; then
@@ -133,7 +155,9 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
                if [[ "$DOCKER_RUN" != "null" ]]; then 
                   docker stop $CONTAINER && docker rm $CONTAINER && docker pull $IMAGE_LOCAL && docker run $DOCKER_RUN
                fi
+               ((CONTAINERS_NB_U++))
                UPDATED=$(echo -E "$UPDATED$CONTAINER\n")
+               UPDATED_Z=$(echo "$UPDATED $CONTAINER")
             else
                echo " ✅ [$IMAGE_LOCAL] Already up to date."
             fi
@@ -150,12 +174,20 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
                echo " 🚸 [$IMAGE_LOCAL] Update available !"
                UPDATE=$(echo -E "$UPDATE$IMAGE\n")
                CONTAINERS=$(echo -E "$CONTAINERS$CONTAINER\n")
+               CONTAINERS_Z=$(echo "$CONTAINERS $CONTAINER")
+               ((CONTAINERS_NB++))
             else
                echo " ✅ [$IMAGE_LOCAL] Already up to date."
             fi
          fi
     fi
 done
+if [[ -n $ZABBIX_SRV ]]; then
+   Send-Zabbix-Data "update.container_to_update_nb" $CONTAINERS_NB
+   Send-Zabbix-Data "update.container_to_update_names" $CONTAINERS_Z
+   Send-Zabbix-Data "update.container_updated_nb" $CONTAINERS_NB_U
+   Send-Zabbix-Data "update.container_updated_names" $UPDATED_Z
+fi
 echo ""
 docker image prune -f
 

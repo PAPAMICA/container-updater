@@ -3,7 +3,7 @@ A little bash script for alert and autoupdate container deployed with docker-com
 Send notification to Discord :
 ![ohunebellenotif](https://send.papamica.fr/f.php?h=25rsdWHk&p=1)
 
-
+Ajout du support de Zabbix, pensez à installer `zabbix-sender` et à ajouter le serveur Zabbix en second argupment.
 # Supervision
 Pour superviser les mises à jours d'un conteneurs, il suffit d'ajouter ce label :
 ```yaml
@@ -44,7 +44,7 @@ labels:
 ```bash
 git clone https://github.com/PAPAMICA/container-updater
 cd container-updater
-./container-updater.sh <discord_webhook>
+./container-updater.sh <discord_webhook> <zabbix_server>
 ```
 
 ## Pour une execution journalière, ajouter un cron
