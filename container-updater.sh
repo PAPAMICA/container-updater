@@ -282,7 +282,7 @@ if [[ ! -z "$UPDATED" ]]; then
       {
          "title":"Containers are autoupdated !",
          "color":5832543,
-         "fields":[gi
+         "fields":[
             {
                "name":"Auto Updated",
                "value":"'$UPDATED'",
