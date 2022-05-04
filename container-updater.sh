@@ -12,48 +12,99 @@ if [ "$DOCKER_INFO_OUTPUT" != "Containers:" ]
 fi
 
 
+
+# check if first part of image name contains a dot, then it's a registry domain and not from hub.docker.com
+Check-Image-Uptdate () {
+   IMAGE_ABSOLUTE=$1
+   if [[ $(echo $IMAGE_ABSOLUTE | cut -d : -f 1 | cut -d / -f 1) == *"."* ]] ; then
+      IMAGE_REGISTRY=$(echo $IMAGE_ABSOLUTE | cut -d / -f 1)
+      IMAGE_REGISTRY_API=$IMAGE_REGISTRY
+      IMAGE_PATH_FULL=$(echo $IMAGE_ABSOLUTE | cut -d / -f 2-)
+   elif [[ $(echo $IMAGE_ABSOLUTE | awk -F"/" '{print NF-1}') == 0 ]] ; then
+      IMAGE_REGISTRY="docker.io"
+      IMAGE_REGISTRY_API="registry-1.docker.io"
+      IMAGE_PATH_FULL=library/$IMAGE_ABSOLUTE
+   else
+      IMAGE_REGISTRY="docker.io"
+      IMAGE_REGISTRY_API="registry-1.docker.io"
+      IMAGE_PATH_FULL=$IMAGE_ABSOLUTE
+   fi
+
+   # detect image tag
+   if [[ "$IMAGE_PATH_FULL" == *":"* ]] ; then
+      IMAGE_PATH=$(echo $IMAGE_PATH_FULL | cut -d : -f 1)
+      IMAGE_TAG=$(echo $IMAGE_PATH_FULL | cut -d : -f 2)
+      IMAGE_LOCAL="$IMAGE_ABSOLUTE"
+   else
+      IMAGE_PATH=$IMAGE_PATH_FULL
+      IMAGE_TAG="latest"
+      IMAGE_LOCAL="$IMAGE_ABSOLUTE:latest"
+   fi
+   # printing full image information
+   #echo "Checking for available update for $IMAGE_REGISTRY/$IMAGE_PATH:$IMAGE_TAG..."
+}
+
+
+
+Check-Local-Digest () {
+   DIGEST_LOCAL=$(docker images -q --no-trunc $IMAGE_LOCAL)
+   if [ -z "${DIGEST_LOCAL}" ] ; then
+      echo "Local digest: not found" 1>&2
+      echo "For security reasons, this script only allows updates of already pulled images." 1>&2
+      exit 1
+   fi
+   #echo "Local digest:  ${DIGEST_LOCAL}"
+}
+
+Check-Remote-Digest () {
+   AUTH_DOMAIN_SERVICE=$(curl --head "https://${IMAGE_REGISTRY_API}/v2/" 2>&1 | grep realm | cut -f2- -d "=" | tr "," "?" | tr -d '"' | tr -d "\r")
+   AUTH_SCOPE="repository:${IMAGE_PATH}:pull"
+   AUTH_TOKEN=$(curl --silent "${AUTH_DOMAIN_SERVICE}&scope=${AUTH_SCOPE}&offline_token=1&client_id=shell" | jq -r '.token')
+   DIGEST_RESPONSE=$(curl --silent -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+      -H "Authorization: Bearer ${AUTH_TOKEN}" \
+      "https://${IMAGE_REGISTRY_API}/v2/${IMAGE_PATH}/manifests/${IMAGE_TAG}")
+   RESPONSE_ERRORS=$(jq -r "try .errors[] // empty" <<< $DIGEST_RESPONSE)
+   if [[ -n $RESPONSE_ERRORS ]]; then
+      echo "Error during API request occurred: $(echo "$RESPONSE_ERRORS" | jq -r .message)" 1>&2
+      exit 1
+   fi
+   DIGEST_REMOTE=$(jq -r ".config.digest" <<< $DIGEST_RESPONSE)
+
+   #echo "Remote digest: ${DIGEST_REMOTE}"
+}
+
+
+Compare-Digest () {
+   if [ "$DIGEST_LOCAL" != "$DIGEST_REMOTE" ] ; then
+      echo " 🚀 [$IMAGE_LOCAL] Update available !"
+      UPDATE=$(echo -E "$UPDATE$IMAGE\n")
+      CONTAINERS=$(echo -E "$CONTAINERS$CONTAINER\n")
+   else
+      echo " ✅ [$IMAGE_LOCAL] Already up to date."
+   fi
+}
+
+
+
+
 for CONTAINER in $(docker ps --format {{.Names}}); do
     AUTOUPDATE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate"')
     if [ "$AUTOUPDATE" == "true" ]; then
         IMAGE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Image')
-        if ! docker pull $IMAGE | grep "Image is up to date"; then
-            if [ $? != 0 ]; then
-                ERROR=$(cat $ERROR_FILE | grep "not found")
-                if [ "$ERROR" != "" ]; then
-                echo "WARNING: Docker image $IMAGE not found in repository, skipping"
-                else
-                echo "ERROR: docker pull failed on image - $IMAGE"
-                exit 2
-                fi
-            else
-                PORTAINER_WEBHOOK=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.webhook"')
-                curl -X POST $PORTAINER_WEBHOOK
-                UPDATED=$(echo -E "$UPDATED$CONTAINER\n")
-            fi
-        fi
+        Check-Image-Uptdate $IMAGE
+        Check-Local-Digest
+        Check-Remote-Digest
+        Compare-Digest
     fi
     if [ "$AUTOUPDATE" == "monitor" ]; then
         IMAGE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Image')
-        if ! docker pull $IMAGE | grep "Image is up to date"; then
-            if [ $? != 0 ]; then
-                ERROR=$(cat $ERROR_FILE | grep "not found")
-                if [ "$ERROR" != "" ]; then
-                echo "WARNING: Docker image $IMAGE not found in repository, skipping"
-                else
-                echo "ERROR: docker pull failed on image - $IMAGE"
-                exit 2
-                fi
-            else
-                echo "Status: $IMAGE has been updated !"
-                UPDATE=$(echo -E "$UPDATE$IMAGEgic fix
-                \n")
-                CONTAINERS=$(echo -E "$UPDATE$CONTAINER\n")
-                
-            fi
-        fi
+        Check-Image-Uptdate $IMAGE
+        Check-Local-Digest
+        Check-Remote-Digest
+        Compare-Digest
     fi
 done
-docker image prune -f
+# docker image prune -f
 
 if [[ ! -z "$UPDATED" ]]; then 
     curl  -H "Content-Type: application/json" \
