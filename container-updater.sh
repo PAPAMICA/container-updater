@@ -226,7 +226,7 @@ if [[ -n $DISCORD_URL ]]; then
       "content":null,
       "embeds":[
          {
-            "title":"There are some updates to do !",
+            "title":" 🚸 There are some updates to do !",
             "color":16759896,
             "fields":[
                {
@@ -245,7 +245,7 @@ if [[ -n $DISCORD_URL ]]; then
                   "inline":true
                },
                {
-                  "name":"Auto Updated",
+                  "name":" 🚀 Auto Updated",
                   "value":"'$UPDATED'",
                   "inline":false
                }
@@ -270,7 +270,7 @@ if [[ -n $DISCORD_URL ]]; then
       "content":null,
       "embeds":[
          {
-            "title":"There are some updates to do !",
+            "title":" 🚸 There are some updates to do !",
             "color":16759896,
             "fields":[
                {
@@ -284,7 +284,7 @@ if [[ -n $DISCORD_URL ]]; then
                   "inline":true
                },
                {
-                  "name":"Auto Updated",
+                  "name":" 🚀 Auto Updated",
                   "value":"'$UPDATED'",
                   "inline":false
                }
@@ -309,7 +309,7 @@ if [[ -n $DISCORD_URL ]]; then
       "content":null,
       "embeds":[
          {
-            "title":"Containers are autoupdated !",
+            "title":" 🚀 Containers are autoupdated !",
             "color":5832543,
             "fields":[
                {
@@ -318,7 +318,7 @@ if [[ -n $DISCORD_URL ]]; then
                   "inline":true
                },
                {
-                  "name":"Auto Updated",
+                  "name":" 🚀 Auto Updated",
                   "value":"'$UPDATED'",
                   "inline":false
                }
@@ -343,11 +343,11 @@ if [[ -n $DISCORD_URL ]]; then
       "content":null,
       "embeds":[
          {
-            "title":"Containers are autoupdated !",
+            "title":" 🚀 Containers are autoupdated !",
             "color":5832543,
             "fields":[
                {
-                  "name":"Auto Updated",
+                  "name":" 🚀 Auto Updated",
                   "value":"'$UPDATED'",
                   "inline":false
                }
@@ -373,7 +373,7 @@ if [[ -n $DISCORD_URL ]]; then
          "content":null,
          "embeds":[
             {
-               "title":"There are some updates to do !",
+               "title":" 🚸 There are some updates to do !",
                "color":16759896,
                   "fields":[
                   {
@@ -412,7 +412,7 @@ if [[ -n $DISCORD_URL ]]; then
          "content":null,
          "embeds":[
             {
-               "title":"There are some updates to do !",
+               "title":" 🚸 There are some updates to do !",
                "color":16759896,
                "fields":[
                   {
@@ -446,7 +446,7 @@ if [[ -n $DISCORD_URL ]]; then
          "content":null,
          "embeds":[
             {
-               "title":"There are some updates to do !",
+               "title":" 🚸 There are some updates to do !",
                "color":16759896,
                   "fields":[
                   {
@@ -473,7 +473,7 @@ if [[ -n $DISCORD_URL ]]; then
       "content":null,
       "embeds":[
          {
-            "title":"Everything is up to date ! 😍",
+            "title":" ✅ Everything is up to date ! 😍",
             "color":5832543,
             "author":{
                "name":"'$HOSTNAME'"
