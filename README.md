@@ -1,54 +1,56 @@
 # container-updater
-A little bash script for alert and autoupdate container deployed with docker-compose, or docker run or Portainer.
-Send notification to Discord :
+🚀 A little bash script for alert and autoupdate container deployed with docker-compose or Portainer.
+
+🔆 Send notification to Discord :
 ![ohunebellenotif](https://send.papamica.fr/f.php?h=25rsdWHk&p=1)
 
-Ajout du support de Zabbix, pensez à installer `zabbix-sender` et à ajouter le serveur Zabbix en second argupment.
-# Supervision
-Pour superviser les mises à jours d'un conteneurs, il suffit d'ajouter ce label :
-```yaml
-labels:
-    - "autoupdate=monitor"
+🆕 Adding Zabbix support, remember to install `zabbix-sender` and add the Zabbix server as a second argument.
+
+
+## Requirements
 ```
-Dans ce cas, si une mise à jour est disponible, le script se contentera d'envoyer une notification à Discord.
-Il ne vous restera plus qu'à mettre à jour le conteneur.
-
-# Auto-update
-Pour activer la mise à jour automatique du conteneur, il faut ajouter ces labels :
-
-## docker-compose
-```yaml
-labels:
-    - "autoupdate=true"
-    - "autoupdate.docker-compose=/lien/vers/le/fichier/docker-compose.yml"
+jq, zabbix-sender (if you use Zabbix)
 ```
 
-## docker-run
-```yaml
-labels:
-    - "autoupdate=true"
-    - "autoupdate.docker-run=<docker_run_command>"
-```
-Note : ne pas inclure `docker run` dans la commande (juste la suite).
-
-## Portainer
-Vous avez besoin d'avoir Portainer en version entreprise (licence gratuite jusqu'à 5 nodes)
-Vous trouverez le webhook dans les paramètres de la stack ou du container.
-```yaml
-labels:
-    - "autoupdate=true"
-    - "autoupdate.webhook=<webhook_url>"
-```
-
-# Utilisation
+## Use 
 ```bash
 git clone https://github.com/PAPAMICA/container-updater
 cd container-updater
 ./container-updater.sh <discord_webhook> <zabbix_server>
 ```
 
-## Pour une execution journalière, ajouter un cron
+### For a daily execution, add a cron
 ```bash
 00 09 * * * /chemin/vers/container-updater.sh <discord_webhook> >> /var/log/container-updater.log
 ```
+
+## Monitoring
+To supervise the updates of a container, you just have to add this label:
+```yaml
+labels:
+    - "autoupdate=monitor"
+```
+In this case, if an update is available, the script will simply send a notification to Discord.
+All you have to do is update the container.
+
+## Auto-update
+To activate the automatic update of the container, you must add these labels:
+
+### docker-compose
+```yaml
+labels:
+    - "autoupdate=true"
+    - "autoupdate.docker-compose=/lien/vers/le/fichier/docker-compose.yml"
+```
+
+### Portainer
+You need to have Portainer in enterprise version (free license up to 5 nodes)
+You can find the webhook in the stack or container settings.
+```yaml
+labels:
+    - "autoupdate=true"
+    - "autoupdate.webhook=<webhook_url>"
+```
+
+
 
