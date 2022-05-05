@@ -38,10 +38,8 @@ To activate the automatic update of the container, you must add these labels:
 
 
 ### docker run
-```yaml
-labels:
-    - "autoupdate=true"
-    - "autoupdate.docker-run=true"
+```bash
+-l "autoupdate=true" -l "autoupdate.docker-run=true"
 ```
 
 ### docker-compose
