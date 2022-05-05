@@ -1,11 +1,12 @@
 # container-updater
 🚀 A little bash script for alert and autoupdate containers deployed with docker run, docker-compose or Portainer.
 
-🔆 Send notification to Discord :
+🟣 Send notification to Discord (optionnal)
+
+🔴 Send data to Zabbix (optionnal)
+
+🔆 Discord notification exemple :
 ![ohunebellenotif](https://send.papamica.fr/f.php?h=25rsdWHk&p=1)
-
-🆕 Adding Zabbix support, remember to install `zabbix-sender` and add the Zabbix server as a second argument.
-
 
 ## Requirements
 ```
