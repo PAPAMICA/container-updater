@@ -57,7 +57,7 @@ To activate the automatic update of the container, you must add these labels:
 ```yaml
 labels:
     - "autoupdate=true"
-    - "autoupdate.docker-compose=/lien/vers/le/fichier/docker-compose.yml"
+    - "autoupdate.docker-compose=/link/to/docker-compose.yml"
 ```
 
 ### Portainer
