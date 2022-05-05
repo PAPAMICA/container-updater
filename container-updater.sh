@@ -153,7 +153,8 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
                fi
                DOCKER_RUN=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.docker-run"')
                if [[ "$DOCKER_RUN" != "null" ]]; then 
-                  docker stop $CONTAINER && docker rm $CONTAINER && docker pull $IMAGE_LOCAL && docker run $DOCKER_RUN
+                  COMMAND=$(docker inspect --format "$(curl -s https://gist.githubusercontent.com/efrecon/8ce9c75d518b6eb863f667442d7bc679/raw/run.tpl)" $CONTAINER)
+                  docker stop $CONTAINER && docker rm $CONTAINER && docker pull $IMAGE_LOCAL && eval "$COMMAND"
                fi
                ((CONTAINERS_NB_U++))
                UPDATED=$(echo -E "$UPDATED$CONTAINER\n")

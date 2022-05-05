@@ -1,5 +1,5 @@
 # container-updater
-🚀 A little bash script for alert and autoupdate container deployed with docker-compose or Portainer.
+🚀 A little bash script for alert and autoupdate container deployed with docker run, docker-compose or Portainer.
 
 🔆 Send notification to Discord :
 ![ohunebellenotif](https://send.papamica.fr/f.php?h=25rsdWHk&p=1)
@@ -35,6 +35,14 @@ All you have to do is update the container.
 
 ## Auto-update
 To activate the automatic update of the container, you must add these labels:
+
+
+### docker run
+```yaml
+labels:
+    - "autoupdate=true"
+    - "autoupdate.docker-run=true"
+```
 
 ### docker-compose
 ```yaml
