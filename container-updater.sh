@@ -146,15 +146,18 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
                DOCKER_COMPOSE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.docker-compose"')
                if [[ "$DOCKER_COMPOSE" != "null" ]]; then 
                   docker-compose pull -f $DOCKER_COMPOSE && docker-compose -f $DOCKER_COMPOSE up -d
+                  echo " 🔆 [$IMAGE_LOCAL] Successful update !"
                fi
                PORTAINER_WEBHOOK=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.webhook"')
                if [[ "$PORTAINER_WEBHOOK" != "null" ]]; then 
                   curl -X POST $PORTAINER_WEBHOOK
+                  echo " 🔆 [$IMAGE_LOCAL] Successful update !"
                fi
                DOCKER_RUN=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.docker-run"')
                if [[ "$DOCKER_RUN" != "null" ]]; then 
                   COMMAND=$(docker inspect --format "$(curl -s https://gist.githubusercontent.com/efrecon/8ce9c75d518b6eb863f667442d7bc679/raw/run.tpl > /dev/null)" $CONTAINER)
                   docker stop $CONTAINER > /dev/null && docker rm $CONTAINER > /dev/null && docker pull $IMAGE_LOCAL > /dev/null && eval "$COMMAND" > /dev/null
+                  echo " 🔆 [$IMAGE_LOCAL] Successful update !"
                fi
                ((CONTAINERS_NB_U++))
                UPDATED=$(echo -E "$UPDATED$CONTAINER\n")
