@@ -16,12 +16,22 @@ jq, zabbix-sender (if you use Zabbix)
 ```bash
 git clone https://github.com/PAPAMICA/container-updater
 cd container-updater
-./container-updater.sh <discord_webhook> <zabbix_server>
+./container-updater.sh
 ```
 
+You can send notification to Discord with this argument:
+```bash
+-d <discord_webhook>
+```
+
+You can send data to Zabbix with this argument:
+```bash
+-z <zabbix_server>
+-n <host_name> (optional)
+```
 ### For a daily execution, add a cron
 ```bash
-00 09 * * * /chemin/vers/container-updater.sh <discord_webhook> >> /var/log/container-updater.log
+00 09 * * * /chemin/vers/container-updater.sh -d <discord_webhook> -z <zabbix_server> >> /var/log/container-updater.log
 ```
 
 ## Monitoring
