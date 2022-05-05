@@ -1,5 +1,5 @@
 # container-updater
-🚀 A little bash script for alert and autoupdate container deployed with docker run, docker-compose or Portainer.
+🚀 A little bash script for alert and autoupdate containers deployed with docker run, docker-compose or Portainer.
 
 🔆 Send notification to Discord :
 ![ohunebellenotif](https://send.papamica.fr/f.php?h=25rsdWHk&p=1)
