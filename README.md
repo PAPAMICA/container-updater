@@ -69,5 +69,9 @@ labels:
     - "autoupdate.webhook=<webhook_url>"
 ```
 
+## To Do
+- Add private registry support
+- Better json generate for Discord notification
+- Others notifications support
 
 
