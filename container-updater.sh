@@ -218,7 +218,7 @@ if [[ -n $ZABBIX_SRV ]]; then
 fi
 echo ""
 docker image prune -f
-if [[ -n $DISCORD_URL ]]; then
+if [[ -n $DISCORD_WEBHOOK ]]; then
    if [[ ! -z "$UPDATED" ]] && [[ ! -z "$UPDATE" ]] && [[ ! -z "$PAQUET_UPDATE" ]]; then 
       curl  -H "Content-Type: application/json" \
       -d '{
