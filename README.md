@@ -5,7 +5,7 @@
 
 🔴 Send data to Zabbix (optionnal)
 
-🔆 Discord notification exemple :
+🔆 Discord notification example :
 ![ohunebellenotif](https://send.papamica.fr/f.php?h=25rsdWHk&p=1)
 
 ## Requirements
