@@ -169,7 +169,7 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
                echo " 🚀 [$IMAGE_LOCAL] Launch autoupdate !"
                DOCKER_COMPOSE=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.docker-compose"')
                if [[ "$DOCKER_COMPOSE" != "null" ]]; then 
-                  docker-compose pull -f $DOCKER_COMPOSE && docker-compose -f $DOCKER_COMPOSE up -d
+                  docker pull $IMAGE_LOCAL && docker-compose -f $DOCKER_COMPOSE up -d
                   echo " 🔆 [$IMAGE_LOCAL] Successful update !"
                fi
                PORTAINER_WEBHOOK=$(docker container inspect $CONTAINER | jq -r '.[].Config.Labels."autoupdate.webhook"')
