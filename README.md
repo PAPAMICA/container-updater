@@ -15,6 +15,7 @@
     <a href="https://github.com/PAPAMICA/container-updater#monitoring"><img src="https://img.shields.io/badge/Monitoring-%2341454A.svg?style=for-the-badge&logo=target&logoColor=white"> </a>
     <a href="https://github.com/PAPAMICA/container-updater#auto-update"><img src="https://img.shields.io/badge/Auto_update-%2341454A.svg?style=for-the-badge&logo=target&logoColor=white"> </a>
     <br /><br />
+    <a href="#"><img src="https://img.shields.io/badge/bash-%23CDCDCE.svg?style=for-the-badge&logo=gnubash&logoColor=1B1B1F"> </a>
     <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/docker-%232496ED.svg?style=for-the-badge&logo=docker&logoColor=white"> </a>
     <a href="https://www.portainer.io/"><img src="https://img.shields.io/badge/portainer-%2313BEF9.svg?style=for-the-badge&logo=portainer&logoColor=white"> </a>
     <a href="https://zabbix.com"><img src="https://img.shields.io/badge/zabbix-%23CC2936.svg?style=for-the-badge&logo=zotero&logoColor=white"> </a>
