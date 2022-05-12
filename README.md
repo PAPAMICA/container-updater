@@ -1,5 +1,26 @@
-# container-updater
-🚀 A little bash script for alert and autoupdate containers deployed with docker run, docker-compose or Portainer.
+<p align="center">
+  <a href="https://papamica.com">
+    <img src="https://zupimages.net/up/20/04/7vtd.png" width="140px" alt="PAPAMICA" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="#"><img src="https://readme-typing-svg.herokuapp.com?center=true&vCenter=true&lines=Container+updater;"></a>
+</p>
+<p align="center">
+    🚀 A little bash script for alert and autoupdate containers deployed with docker run, docker-compose or Portainer.
+</p>
+<p align="center">
+    <a href="https://github.com/PAPAMICA/container-updater#requirements"><img src="https://img.shields.io/badge/How_to_use-%2341454A.svg?style=for-the-badge&logo=target&logoColor=white"> </a>
+    <a href="https://github.com/PAPAMICA/container-updater#monitoring"><img src="https://img.shields.io/badge/Monitoring-%2341454A.svg?style=for-the-badge&logo=target&logoColor=white"> </a>
+    <a href="https://github.com/PAPAMICA/container-updater#auto-update"><img src="https://img.shields.io/badge/Auto_update-%2341454A.svg?style=for-the-badge&logo=target&logoColor=white"> </a>
+    <br /><br />
+    <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/docker-%232496ED.svg?style=for-the-badge&logo=docker&logoColor=white"> </a>
+    <a href="https://www.portainer.io/"><img src="https://img.shields.io/badge/portainer-%2313BEF9.svg?style=for-the-badge&logo=portainer&logoColor=white"> </a>
+    <a href="https://zabbix.com"><img src="https://img.shields.io/badge/zabbix-%23CC2936.svg?style=for-the-badge&logo=zotero&logoColor=white"> </a>
+    <a href="https://www.discord.com"><img src="https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white"> </a>
+    <br />
+</p> 
 
 🟣 Send notification to Discord (optionnal)
 
