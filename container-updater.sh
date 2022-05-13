@@ -245,7 +245,6 @@ echo ""
 docker image prune -f
 if [[ -n $DISCORD_WEBHOOK ]]; then
    if [[ ! -z "$ERROR_C" ]]; then
-      echo $ERROR_M
       curl  -H "Content-Type: application/json" \
       -d '{
       "username":"['$HOSTNAME']",
