@@ -23,6 +23,8 @@
     <br />
 </p> 
 
+🔵 Support of Docker hub (docker.io) and Github (ghcr.io) registries
+
 🟣 Send notification to Discord (optionnal)
 
 🔴 Send data to Zabbix (optionnal)
@@ -40,6 +42,11 @@ jq, zabbix-sender (if you use Zabbix)
 git clone https://github.com/PAPAMICA/container-updater
 cd container-updater
 ./container-updater.sh
+```
+
+If you use Github as registry, you need to set your personnal access token:
+```bash
+-g <access_tocken>
 ```
 
 You can send notification to Discord with this argument:

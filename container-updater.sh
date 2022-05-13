@@ -4,14 +4,17 @@ if [[ $1 == "-h" ]] ||  [[ $1 == "--help" ]]; then
    echo "A little bash script for alert and autoupdate containers deployed with docker-compose, or docker run or Portainer."
    echo "Options availables :"
    echo "  -d <discord_webhook> : Send notification to Discord"
+   echo "  -g <github_access_token> : Provide your token for Github registry"
    echo "  -z <zabbix_server> : Send data to Zabbix"
    echo "  -n \"<host_name>\" : change host name for Zabbix"
    exit
 fi
 
-while getopts ":d:z:n:" opt; do
+while getopts ":d:z:n:g:" opt; do
   case $opt in
     d) DISCORD_WEBHOOK="$OPTARG"
+    ;;
+    g) AUTH_GITHUB="$OPTARG"
     ;;
     z) ZABBIX_SRV="$OPTARG"
     ;;
@@ -130,19 +133,35 @@ Check-Local-Digest () {
 }
 
 Check-Remote-Digest () {
-   AUTH_DOMAIN_SERVICE=$(curl --head "https://${IMAGE_REGISTRY_API}/v2/" 2>&1 | grep realm | cut -f2- -d "=" | tr "," "?" | tr -d '"' | tr -d "\r")
-   AUTH_SCOPE="repository:${IMAGE_PATH}:pull"
-   AUTH_TOKEN=$(curl --silent "${AUTH_DOMAIN_SERVICE}&scope=${AUTH_SCOPE}&offline_token=1&client_id=shell" | jq -r '.token')
-   DIGEST_RESPONSE=$(curl --silent -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
-      -H "Authorization: Bearer ${AUTH_TOKEN}" \
-      "https://${IMAGE_REGISTRY_API}/v2/${IMAGE_PATH}/manifests/${IMAGE_TAG}")
-   RESPONSE_ERRORS=$(jq -r "try .errors[] // empty" <<< $DIGEST_RESPONSE)
-   if [[ -n $RESPONSE_ERRORS ]]; then
-      echo " ❌ [$IMAGE_LOCAL] Error : $(echo "$RESPONSE_ERRORS" | jq -r .message)" 1>&2
-   fi
-   DIGEST_REMOTE=$(jq -r ".config.digest" <<< $DIGEST_RESPONSE)
-
+   if [ "$IMAGE_REGISTRY" == "docker.io" ]; then
+      AUTH_DOMAIN_SERVICE=$(curl --head "https://${IMAGE_REGISTRY_API}/v2/" 2>&1 | grep realm | cut -f2- -d "=" | tr "," "?" | tr -d '"' | tr -d "\r")
+      AUTH_SCOPE="repository:${IMAGE_PATH}:pull"
+      AUTH_TOKEN=$(curl --silent "${AUTH_DOMAIN_SERVICE}&scope=${AUTH_SCOPE}&offline_token=1&client_id=shell" | jq -r '.token')
+      DIGEST_RESPONSE=$(curl --silent -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+         -H "Authorization: Bearer ${AUTH_TOKEN}" \
+         "https://${IMAGE_REGISTRY_API}/v2/${IMAGE_PATH}/manifests/${IMAGE_TAG}")
+      RESPONSE_ERRORS=$(jq -r "try .errors[] // empty" <<< $DIGEST_RESPONSE)
+      if [[ -n $RESPONSE_ERRORS ]]; then
+         echo " ❌ [$IMAGE_LOCAL] Error : $(echo "$RESPONSE_ERRORS" | jq -r .message)" 1>&2
+      fi
+      DIGEST_REMOTE=$(jq -r ".config.digest" <<< $DIGEST_RESPONSE)
+   elif [ "$IMAGE_REGISTRY" == "ghcr.io" ]; then
+      if [[ -n $AUTH_GITHUB ]]; then
+         TOKEN=$(curl -s -u username:$AUTH_GITHUB https://ghcr.io/token\?service\=ghcr.io\&scope\=repository:${IMAGE_PATH}:pull\&client_id\=atomist | jq -r '.token')
+         DIGEST_RESPONSE=$(curl -s -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.docker.distribution.manifest.v2+json" https://ghcr.io/v2/${IMAGE_PATH}/manifests/${IMAGE_TAG})
+         RESPONSE_ERRORS=$(jq -r 'try .errors[].message' <<< $DIGEST_RESPONSE)
+         if [[ -n $RESPONSE_ERRORS ]]; then
+            echo " ❌ [$IMAGE_LOCAL] Error : $(echo "$RESPONSE_ERRORS")" 1>&2
+         fi
+         DIGEST_REMOTE=$(jq -r '.config.digest' <<< $DIGEST_RESPONSE)
+      else
+         echo " ❌ [$IMAGE_LOCAL] Provide your Github personnal access token please !" 1>&2
+         RESPONSE_ERRORS="error"
+      fi
+   else
+      echo " ❌ [$IMAGE_LOCAL] Error: Can't check this repository !" 1>&2
    #echo "Remote digest: ${DIGEST_REMOTE}"
+   fi
 }
 
 
