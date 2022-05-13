@@ -140,23 +140,23 @@ Check-Remote-Digest () {
       DIGEST_RESPONSE=$(curl --silent -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
          -H "Authorization: Bearer ${AUTH_TOKEN}" \
          "https://${IMAGE_REGISTRY_API}/v2/${IMAGE_PATH}/manifests/${IMAGE_TAG}")
-      RESPONSE_ERRORS=$(jq -r "try .errors[] // empty" <<< $DIGEST_RESPONSE)
+      RESPONSE_ERRORS=$(jq -r "try .errors[].code" <<< $DIGEST_RESPONSE)
       if [[ -n $RESPONSE_ERRORS ]]; then
-         echo " ❌ [$IMAGE_LOCAL] Error : $(echo "$RESPONSE_ERRORS" | jq -r .message)" 1>&2
+         echo " ❌ [$IMAGE_LOCAL] Error : $(echo "$RESPONSE_ERRORS")" 1>&2
       fi
       DIGEST_REMOTE=$(jq -r ".config.digest" <<< $DIGEST_RESPONSE)
    elif [ "$IMAGE_REGISTRY" == "ghcr.io" ]; then
       if [[ -n $AUTH_GITHUB ]]; then
          TOKEN=$(curl -s -u username:$AUTH_GITHUB https://ghcr.io/token\?service\=ghcr.io\&scope\=repository:${IMAGE_PATH}:pull\&client_id\=atomist | jq -r '.token')
          DIGEST_RESPONSE=$(curl -s -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.docker.distribution.manifest.v2+json" https://ghcr.io/v2/${IMAGE_PATH}/manifests/${IMAGE_TAG})
-         RESPONSE_ERRORS=$(jq -r 'try .errors[].message' <<< $DIGEST_RESPONSE)
+         RESPONSE_ERRORS=$(jq -r 'try .errors[].code' <<< $DIGEST_RESPONSE)
          if [[ -n $RESPONSE_ERRORS ]]; then
             echo " ❌ [$IMAGE_LOCAL] Error : $(echo "$RESPONSE_ERRORS")" 1>&2
          fi
          DIGEST_REMOTE=$(jq -r '.config.digest' <<< $DIGEST_RESPONSE)
       else
          echo " ❌ [$IMAGE_LOCAL] Provide your Github personnal access token please !" 1>&2
-         RESPONSE_ERRORS="error"
+         RESPONSE_ERRORS="NO-TOKEN"
       fi
    else
       echo " ❌ [$IMAGE_LOCAL] Error: Can't check this repository !" 1>&2
@@ -208,6 +208,9 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
             else
                echo " ✅ [$IMAGE_LOCAL] Already up to date."
             fi
+         else
+            ERROR_C=$(echo -E "$ERROR_C$IMAGE\n")
+            ERROR_M=$(echo -E "$ERROR_M$RESPONSE_ERRORS\n")
          fi
     fi
     if [ "$AUTOUPDATE" == "monitor" ]; then
@@ -226,6 +229,9 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
             else
                echo " ✅ [$IMAGE_LOCAL] Already up to date."
             fi
+         else
+            ERROR_C=$(echo -E "$ERROR_C$IMAGE\n")
+            ERROR_M=$(echo -E "$ERROR_M$RESPONSE_ERRORS\n")
          fi
     fi
 done
@@ -238,6 +244,78 @@ fi
 echo ""
 docker image prune -f
 if [[ -n $DISCORD_WEBHOOK ]]; then
+   if [[ ! -z "$ERROR_C" ]]; then
+      echo $ERROR_M
+      curl  -H "Content-Type: application/json" \
+      -d '{
+      "username":"['$HOSTNAME']",
+      "content":null,
+      "embeds":[
+         {
+            "title":" ❌ Error when check for update !",
+            "color":16734296,
+            "fields":[
+               {
+                  "name":"Images",
+                  "value":"'$ERROR_C'",
+                  "inline":true
+               },
+               {
+                  "name":"Errors",
+                  "value":"'$ERROR_M'",
+                  "inline":true
+               }
+            ],
+            "author":{
+               "name":"'$HOSTNAME'"
+            }
+         }
+      ],
+      "attachments":[
+         
+      ]
+   }' \
+      $DISCORD_WEBHOOK
+   fi
+
+   if [[ ! -z "$UPDATED" ]] && [[ ! -z "$UPDATE" ]]; then 
+      curl  -H "Content-Type: application/json" \
+      -d '{
+      "username":"['$HOSTNAME']",
+      "content":null,
+      "embeds":[
+         {
+            "title":" 🚸 There are some updates to do !",
+            "color":16759896,
+            "fields":[
+               {
+                  "name":"Containers",
+                  "value":"'$CONTAINERS'",
+                  "inline":true
+               },
+               {
+                  "name":"Images",
+                  "value":"'$UPDATE'",
+                  "inline":true
+               },
+               {
+                  "name":" 🚀 Auto Updated",
+                  "value":"'$UPDATED'",
+                  "inline":false
+               }
+            ],
+            "author":{
+               "name":"'$HOSTNAME'"
+            }
+         }
+      ],
+      "attachments":[
+         
+      ]
+   }' \
+      $DISCORD_WEBHOOK
+      exit
+   fi
    if [[ ! -z "$UPDATED" ]] && [[ ! -z "$UPDATE" ]] && [[ ! -z "$PAQUET_UPDATE" ]]; then 
       curl  -H "Content-Type: application/json" \
       -d '{
