@@ -59,9 +59,14 @@ You can send data to Zabbix with this argument:
 -z <zabbix_server>
 -n <host_name> (optional)
 ```
+
+You can blacklist packages for autoupdate:
+```bash
+-b <package,package>
+```
 ### For a daily execution, add a cron
 ```bash
-00 09 * * * /chemin/vers/container-updater.sh -d <discord_webhook> -z <zabbix_server> >> /var/log/container-updater.log
+00 09 * * * /chemin/vers/container-updater.sh -d <discord_webhook> -b <package,package> -z <zabbix_server> >> /var/log/container-updater.log
 ```
 
 ## Monitoring
