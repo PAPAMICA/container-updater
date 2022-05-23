@@ -11,7 +11,7 @@ if [[ $1 == "-h" ]] ||  [[ $1 == "--help" ]]; then
    exit
 fi
 
-while getopts ":d:z:n:g:" opt; do
+while getopts ":d:b:z:n:g:" opt; do
   case $opt in
     d) DISCORD_WEBHOOK="$OPTARG"
     ;;
