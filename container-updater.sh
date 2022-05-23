@@ -1,9 +1,10 @@
 #!/bin/bash
-
+BLACKLIST=""
 if [[ $1 == "-h" ]] ||  [[ $1 == "--help" ]]; then
    echo "A little bash script for alert and autoupdate containers deployed with docker-compose, or docker run or Portainer."
    echo "Options availables :"
    echo "  -d <discord_webhook> : Send notification to Discord"
+   echo "  -b <package,package> : Blacklist packages for autoupdate"
    echo "  -g <github_access_token> : Provide your token for Github registry"
    echo "  -z <zabbix_server> : Send data to Zabbix"
    echo "  -n \"<host_name>\" : change host name for Zabbix"
@@ -13,6 +14,8 @@ fi
 while getopts ":d:z:n:g:" opt; do
   case $opt in
     d) DISCORD_WEBHOOK="$OPTARG"
+    ;;
+    b) BLACKLIST="$OPTARG"
     ;;
     g) AUTH_GITHUB="$OPTARG"
     ;;
@@ -63,10 +66,23 @@ PAQUET_UPDATE=""
 PAQUET_NB=0
 apt list --upgradable 2> /dev/null | tail -n +2 >> temp
 while read line ; do 
-    PAQUET=$(echo $line | cut -d / -f 1)
-    echo "  🚸 Update available: $PAQUET"
-    PAQUET_UPDATE=$(echo -E "$PAQUET_UPDATE$PAQUET\n")
-    ((PAQUET_NB++))
+   PAQUET=$(echo $line | cut -d / -f 1)
+   echo "  🚸 Update available: $PAQUET"
+   if [[ "$BLACKLIST" == *"$PAQUET"* ]]; then
+      PAQUET_UPDATE=$(echo -E "$PAQUET_UPDATE$PAQUET\n")
+      ((PAQUET_NB++))
+   else
+      echo " 🚀 [$PAQUET] Launch autoupdate !"
+      apt-get --only-upgrade install $PAQUET > /dev/null 2> /dev/null
+      status=$?
+      if test $status -eq 0; then
+         echo " 🔆 [$PAQUET] Successful update !"
+         UPDATED=$(echo -E "$UPDATED$PAQUET\n")
+      else
+         echo " ❌ [$PAQUET] Update failed !"
+         PAQUET_UPDATE=$(echo -E "$PAQUET_UPDATE$PAQUET\n")
+      fi
+   fi
 done < temp
 rm temp
 
@@ -405,7 +421,7 @@ if [[ -n $DISCORD_WEBHOOK ]]; then
       "content":null,
       "embeds":[
          {
-            "title":" 🚀 Containers are autoupdated !",
+            "title":" 🚀 Containers or packages are autoupdated !",
             "color":5832543,
             "fields":[
                {
@@ -439,7 +455,7 @@ if [[ -n $DISCORD_WEBHOOK ]]; then
       "content":null,
       "embeds":[
          {
-            "title":" 🚀 Containers are autoupdated !",
+            "title":" 🚀 Containers or packages are autoupdated !",
             "color":5832543,
             "fields":[
                {

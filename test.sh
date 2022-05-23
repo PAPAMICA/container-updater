@@ -1,7 +1,7 @@
-PAQUET="prout,docker*,youpi"
-BLACKLIST="prout,docker*,youpi"
-if [ "$PAQUET" != "$BLACKLIST" ]; then
-    echo "pas dans la liste"
+PAQUET="docker-compose"
+BLACKLIST="prout,docker-compose,youpi"
+if [[ "$BLACKLIST" == *"$PAQUET"* ]]; then
+    echo "+ dans la liste"
 else
-    echo "dans la liste"
+    echo "- pas dans la liste"
 fi
