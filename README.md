@@ -95,7 +95,7 @@ labels:
 ```
 
 ### Portainer
-You need to have Portainer in enterprise version (free license up to 5 nodes). 
+You need to have Portainer in enterprise version ([free license up to 5 nodes](https://www.portainer.io/pricing/take5?hsLang=en)). 
 You can find the webhook in the stack or container settings.
 ```yaml
 labels:
