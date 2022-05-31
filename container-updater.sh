@@ -77,7 +77,7 @@ while read line ; do
       status=$?
       if test $status -eq 0; then
          echo " 🔆 [$PAQUET] Successful update !"
-         UPDATED=$(echo -E "$UPDATED$PAQUET\n")
+         UPDATED=$(echo -E "$UPDATED📦 $PAQUET\n")
       else
          echo " ❌ [$PAQUET] Update failed !"
          PAQUET_UPDATE=$(echo -E "$PAQUET_UPDATE$PAQUET\n")
@@ -219,7 +219,7 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
                   echo " 🔆 [$IMAGE_LOCAL] Successful update !"
                fi
                ((CONTAINERS_NB_U++))
-               UPDATED=$(echo -E "$UPDATED$CONTAINER\n")
+               UPDATED=$(echo -E "$UPDATED🐳 $CONTAINER\n")
                UPDATED_Z=$(echo "$UPDATED $CONTAINER")
             else
                echo " ✅ [$IMAGE_LOCAL] Already up to date."
