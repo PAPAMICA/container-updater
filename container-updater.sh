@@ -219,7 +219,7 @@ for CONTAINER in $(docker ps --format {{.Names}}); do
                   echo " 🔆 [$IMAGE_LOCAL] Successful update !"
                fi
                ((CONTAINERS_NB_U++))
-               UPDATED=$(echo -E "$UPDATED 🐳 $CONTAINER\n")
+               UPDATED=$(echo -E "$UPDATED 🐋 $CONTAINER\n")
                UPDATED_Z=$(echo "$UPDATED $CONTAINER")
             else
                echo " ✅ [$IMAGE_LOCAL] Already up to date."
